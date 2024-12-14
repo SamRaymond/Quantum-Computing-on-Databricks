@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "quantum-computing-on-databricks"
+version = "0.1.0"
+description = "An introduction to leveraging databricks for quantum computing programming development"
+authors = ["Sam Raymond <samueljraymond@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+qiskit = "^1.3.1"
+matplotlib = "^3.10.0"
+qiskit-ibm-runtime = "^0.34.0"
+pylatexenc = "^2.10"
+qiskit-aer = "^0.15.1"
+python-dotenv = "^1.0.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
