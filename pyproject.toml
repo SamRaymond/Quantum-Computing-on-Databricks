@@ -15,6 +15,7 @@ pylatexenc = "^2.10"
 qiskit-aer = "^0.15.1"
 python-dotenv = "^1.0.1"
 asyncio = "^3.4.3"
+scikit-learn = "^1.6.0"
 
 
 [build-system]
