@@ -1,3 +1,6 @@
+# Databricks notebook source
+# COMMAND ----------
+# MAGIC %md
 # Quantum Computing with Qiskit: From Theory to Practice
 
 # COMMAND ----------
