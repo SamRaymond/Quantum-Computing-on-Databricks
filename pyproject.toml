@@ -14,6 +14,7 @@ qiskit-ibm-runtime = "^0.34.0"
 pylatexenc = "^2.10"
 qiskit-aer = "^0.15.1"
 python-dotenv = "^1.0.1"
+asyncio = "^3.4.3"
 
 
 [build-system]
