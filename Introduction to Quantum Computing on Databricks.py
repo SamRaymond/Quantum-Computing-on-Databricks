@@ -1,26 +1,25 @@
 # Databricks notebook source
-# COMMAND ----------
 # MAGIC %md
-# Quantum Computing with Qiskit: From Theory to Practice
+# MAGIC # Quantum Computing with Qiskit: From Theory to Practice
 
 # COMMAND ----------
 
 # MAGIC %md
 # MAGIC ## 1. Understanding Quantum Computing: A Quick Recap
-# MAGIC 
+# MAGIC
 # MAGIC Quantum computing harnesses the principles of quantum mechanics to process information in fundamentally different ways than classical computers. Here's what makes it special:
-# MAGIC 
+# MAGIC
 # MAGIC ### Key Concepts:
 # MAGIC - **Superposition**: Unlike classical bits (0 or 1), quantum bits (qubits) can exist in multiple states simultaneously
 # MAGIC - **Entanglement**: Qubits can be correlated in ways that have no classical counterpart
 # MAGIC - **Quantum Interference**: Quantum states can interfere with each other, leading to enhanced or diminished probabilities
-# MAGIC 
+# MAGIC
 # MAGIC ### Where Quantum Computing Makes Sense:
 # MAGIC - Cryptography and security (e.g., Shor's algorithm for factoring large numbers)
 # MAGIC - Optimization problems (e.g., traveling salesman problem)
 # MAGIC - Quantum chemistry simulations
 # MAGIC - Machine learning (quantum neural networks, quantum feature spaces)
-# MAGIC 
+# MAGIC
 # MAGIC ### Where Classical Computing Still Wins:
 # MAGIC - Day-to-day computing tasks
 # MAGIC - Tasks requiring precise, deterministic outcomes
@@ -31,18 +30,18 @@
 
 # MAGIC %md
 # MAGIC ## 2. Introduction to Qiskit
-# MAGIC 
+# MAGIC
 # MAGIC Qiskit is an open-source framework for quantum computing developed by IBM. It provides tools for:
 # MAGIC - Creating and manipulating quantum circuits
 # MAGIC - Running simulations on classical computers
 # MAGIC - Executing programs on real quantum computers
 # MAGIC - Visualizing quantum states and results
-# MAGIC 
+# MAGIC
 # MAGIC ### Setting Up Qiskit Account
 # MAGIC 1. Visit [IBM Quantum Experience](https://quantum-computing.ibm.com)
 # MAGIC 2. Create a free account
 # MAGIC 3. Get your API token from the user settings
-# MAGIC 
+# MAGIC
 # MAGIC Let's install and set up Qiskit:
 
 # COMMAND ----------
@@ -61,7 +60,7 @@ import numpy as np
 
 # MAGIC %md
 # MAGIC ## 3. Your First Quantum Circuit: Creating a Bell State
-# MAGIC 
+# MAGIC
 # MAGIC We'll start with creating a Bell state, one of the simplest examples of quantum entanglement.
 
 # COMMAND ----------
@@ -96,7 +95,7 @@ plot_histogram(counts)
 
 # MAGIC %md
 # MAGIC ## 4. Real-World Application: Quantum Random Number Generator
-# MAGIC 
+# MAGIC
 # MAGIC Let's create a true random number generator using quantum superposition.
 
 # COMMAND ----------
@@ -130,7 +129,7 @@ print(f"Generated random numbers: {random_numbers}")
 
 # MAGIC %md
 # MAGIC ## 5. Exploring Quantum Interference
-# MAGIC 
+# MAGIC
 # MAGIC Let's create a simple interference experiment using the Mach-Zehnder interferometer analog.
 
 # COMMAND ----------
@@ -162,12 +161,12 @@ plot_histogram(counts)
 
 # MAGIC %md
 # MAGIC ## 6. Key Takeaways and Future Directions
-# MAGIC 
+# MAGIC
 # MAGIC - Quantum computing offers unique capabilities for specific types of problems
 # MAGIC - Tools like Qiskit make quantum experimentation accessible
 # MAGIC - Current limitations include decoherence and error rates
 # MAGIC - Active areas of research: error correction, quantum advantage demonstration
-# MAGIC 
+# MAGIC
 # MAGIC ### Next Steps:
 # MAGIC - Explore more complex quantum algorithms
 # MAGIC - Try running circuits on real quantum computers
