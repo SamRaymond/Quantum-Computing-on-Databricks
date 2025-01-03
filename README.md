@@ -1,7 +1,10 @@
 # Quantum Computing on Databricks
 
 This project demonstrates how to set up and run quantum computing experiments using Qiskit on Databricks. 
-For IDE/pur Pythong, the project is configured using [Poetry](https://python-poetry.org/) for dependency management. Otherwise there are two Databricks Notebooks that have been built natively on the platform to be self-contained. 
+
+For IDE/pure Python, the project is configured using [Poetry](https://python-poetry.org/) for dependency management. 
+
+**Otherwise there are two Databricks Notebooks that have been built natively on the platform to be self-contained.**
 
 ## Table of Contents
 
