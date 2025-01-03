@@ -5,6 +5,14 @@
 # COMMAND ----------
 
 # MAGIC %md
+# MAGIC ##### !! ~~ NOTE: These APIs are still under development as of Jan 2025 and may have breaking changes ~~!!
+# MAGIC
+# MAGIC **Tested on MLR 16.1 single node**
+# MAGIC
+
+# COMMAND ----------
+
+# MAGIC %md
 # MAGIC ## 1. Understanding Quantum Computing: A Quick Recap
 # MAGIC
 # MAGIC Quantum computing harnesses the principles of quantum mechanics to process information in fundamentally different ways than classical computers. Here's what makes it special:
@@ -46,22 +54,97 @@
 
 # COMMAND ----------
 
-# Install required packages
-%pip install qiskit qiskit[visualization] pylatexenc
+# Install dependencies
+%pip install qiskit qiskit_aer qiskit_ibm_runtime numpy pylatexenc python-dotenv
+
+# COMMAND ----------
+
+# MAGIC %restart_python
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC
+# MAGIC # Creating Your First Quantum Circuit: The Bell State
+# MAGIC
+# MAGIC ## Introduction to Bell States
+# MAGIC A Bell state represents one of the simplest yet most profound quantum phenomena - quantum entanglement. First proposed by Einstein, Podolsky, and Rosen in 1935, Bell states demonstrate the "spooky action at a distance" that exemplifies quantum mechanics.
+# MAGIC
+# MAGIC ## Building the Circuit: IBM's 4-Step Approach
+# MAGIC
+# MAGIC ### 1. Map: Design and Construction
+# MAGIC We'll map our problem to quantum circuits using Qiskit's building blocks:
+# MAGIC - Two qubits initialized in state |0⟩
+# MAGIC - A Hadamard gate to create superposition
+# MAGIC - A CNOT gate to create entanglement
+# MAGIC - Measurement operations to observe results
+# MAGIC
+# MAGIC **Key Components:**
+# MAGIC - Circuit Library: For basic quantum gates
+# MAGIC - Quantum Info Library: For state visualization
+# MAGIC - Custom Gates (if needed)
+# MAGIC
+# MAGIC ### 2. Optimize: Circuit Transpilation
+# MAGIC Before running on real quantum hardware, we need to optimize our circuit:
+# MAGIC - Use Qiskit's transpiler to convert to hardware-specific gates
+# MAGIC - Apply optimization passes for efficiency
+# MAGIC - Consider noise mitigation strategies
+# MAGIC
+# MAGIC **Optimization Tools:**
+# MAGIC - Basic Transpiler
+# MAGIC - AI-Enhanced Transpilation options
+# MAGIC - Hardware-specific optimizations
+# MAGIC
+# MAGIC ### 3. Execute: Running the Circuit
+# MAGIC We'll execute our circuit using multiple approaches:
+# MAGIC - Simulation for testing
+# MAGIC - Real quantum hardware for actual results
+# MAGIC - Different execution modes for various purposes
+# MAGIC
+# MAGIC **Execution Options:**
+# MAGIC - Local simulator
+# MAGIC - IBM Quantum runtime primitives
+# MAGIC - Various execution modes (shot-based, statevector, etc.)
+# MAGIC
+# MAGIC ### 4. Post-Process: Analyzing Results
+# MAGIC Finally, we'll analyze and visualize our results:
+# MAGIC - State tomography
+# MAGIC - Visualization of quantum states
+# MAGIC - Statistical analysis of measurements
+# MAGIC
+# MAGIC **Analysis Tools:**
+# MAGIC - Quantum Info Library for state analysis
+# MAGIC - Visualization modules for plotting
+# MAGIC - Classical post-processing techniques
+# MAGIC
+# MAGIC ## Expected Outcomes
+# MAGIC After running the circuit, we should observe:
+# MAGIC - Perfect correlations between measurements
+# MAGIC - Approximately 50/50 distribution between |00⟩ and |11⟩ states
+# MAGIC - Evidence of quantum entanglement
 
 # COMMAND ----------
 
 # Import necessary libraries
-from qiskit import QuantumCircuit, execute, Aer
+from qiskit import QuantumCircuit, transpile
+from qiskit_ibm_runtime import QiskitRuntimeService, EstimatorV2 as Estimator  
+from qiskit.quantum_info import SparsePauliOp
+from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager
 from qiskit.visualization import plot_histogram
 import numpy as np
 
 # COMMAND ----------
 
-# MAGIC %md
-# MAGIC ## 3. Your First Quantum Circuit: Creating a Bell State
-# MAGIC
-# MAGIC We'll start with creating a Bell state, one of the simplest examples of quantum entanglement.
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from a .env file
+load_dotenv()
+
+# Retrieve the API token from the environment variable
+IBM_QUANTUM_TOKEN = os.getenv("IBM_QUANTUM_TOKEN")
+
+service = QiskitRuntimeService(channel="ibm_quantum",token=IBM_QUANTUM_TOKEN)
 
 # COMMAND ----------
 
@@ -80,95 +163,125 @@ qc.draw(output='mpl')
 
 # COMMAND ----------
 
-# Execute the circuit on a simulator
-simulator = Aer.get_backend('qasm_simulator')
-job = execute(qc, simulator, shots=1000)
+# Get our backend and generate optimized circuit
+backend = service.backend(name="ibm_brisbane")
+# Convert to an ISA circuit and layout-mapped observables.
+pm = generate_preset_pass_manager(backend=backend, optimization_level=1)
+isa_circuit = pm.run(qc)
+ 
+isa_circuit.draw("mpl", idle_wires=False)
+
+# COMMAND ----------
+
+# Set up six different observables to verify entanglement
+observables_labels = ["IZ", "IX", "ZI", "XI", "ZZ", "XX"]
+observables = [SparsePauliOp(label) for label in observables_labels]
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## To run on a simulator
+
+# COMMAND ----------
+
+ # Use the following code instead if you want to run on a simulator:
+ 
+from qiskit_ibm_runtime.fake_provider import FakeAlmadenV2
+backend = FakeAlmadenV2()
+estimator = Estimator(backend)
+ 
+# Convert to an ISA circuit and layout-mapped observables.
+ 
+pm = generate_preset_pass_manager(backend=backend, optimization_level=1)
+isa_circuit = pm.run(qc)
+mapped_observables = [
+    observable.apply_layout(isa_circuit.layout) for observable in observables
+]
+ 
+job = estimator.run([(isa_circuit, mapped_observables)])
 result = job.result()
+ 
+# This is the result of the entire submission.  You submitted one Pub,
+# so this contains one inner result (and some metadata of its own).
+ 
+job_result = job.result()
+ 
+# This is the result from our single pub, which had five observables,
+# so contains information on all five.
+ 
+pub_result = job.result()[0]
 
-# Get the counts of measurement outcomes
-counts = result.get_counts(qc)
+# COMMAND ----------
 
-# Plot the histogram
-plot_histogram(counts)
+# Plot the result
+ 
+from matplotlib import pyplot as plt
+ 
+values = pub_result.data.evs
+ 
+errors = pub_result.data.stds
+ 
+# plotting graph
+plt.plot(observables_labels, values, "-o")
+plt.xlabel("Observables")
+plt.ylabel("Values")
+plt.show()
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## 4. Real-World Application: Quantum Random Number Generator
-# MAGIC
-# MAGIC Let's create a true random number generator using quantum superposition.
+# MAGIC ## To run on the real Quantum Computer
 
 # COMMAND ----------
 
-def quantum_random_number(bits=4):
-    # Create a quantum circuit with specified number of qubits
-    qc = QuantumCircuit(bits, bits)
-    
-    # Put all qubits in superposition
-    for i in range(bits):
-        qc.h(i)
-    
-    # Measure all qubits
-    qc.measure(range(bits), range(bits))
-    
-    # Execute the circuit
-    simulator = Aer.get_backend('qasm_simulator')
-    job = execute(qc, simulator, shots=1)
-    result = job.result()
-    
-    # Convert binary output to decimal
-    counts = result.get_counts(qc)
-    binary = list(counts.keys())[0]
-    return int(binary, 2)
+# Get our backend and generate optimized circuit
+backend = service.backend(name="ibm_brisbane")
+# Convert to an ISA circuit and layout-mapped observables.
+pm = generate_preset_pass_manager(backend=backend, optimization_level=1)
+isa_circuit = pm.run(qc)
+ 
+isa_circuit.draw("mpl", idle_wires=False)
+# Construct the Estimator instance.
+estimator = Estimator(mode=backend)
+estimator.options.resilience_level = 1
+estimator.options.default_shots = 100
+mapped_observables = [
+    observable.apply_layout(isa_circuit.layout) for observable in observables
+]
 
-# Generate some random numbers
-random_numbers = [quantum_random_number() for _ in range(10)]
-print(f"Generated random numbers: {random_numbers}")
+# One pub, with one circuit to run against five different observables.
+job = estimator.run([(isa_circuit, mapped_observables)])
+ 
+# Use the job ID to retrieve your job data later
+print(f">>> Job ID: {job.job_id()}")
 
 # COMMAND ----------
 
-# MAGIC %md
-# MAGIC ## 5. Exploring Quantum Interference
-# MAGIC
-# MAGIC Let's create a simple interference experiment using the Mach-Zehnder interferometer analog.
+# You can see the status of your run on the IBM Dashboard too:
+# https://quantum.ibm.com/workloads
 
 # COMMAND ----------
 
-# Create interferometer circuit
-qc_interference = QuantumCircuit(1, 1)
-
-# First beam splitter
-qc_interference.h(0)
-
-# Phase shifter
-qc_interference.p(np.pi/4, 0)
-
-# Second beam splitter
-qc_interference.h(0)
-
-# Measure
-qc_interference.measure(0, 0)
-
-# Execute with 1000 shots
-job = execute(qc_interference, simulator, shots=1000)
-result = job.result()
-counts = result.get_counts(qc_interference)
-
-# Plot results
-plot_histogram(counts)
+# This is the result of the entire submission.  You submitted one Pub,
+# so this contains one inner result (and some metadata of its own).
+job_result = job.result()
+ 
+# This is the result from our single pub, which had six observables,
+# so contains information on all six.
+pub_result = job.result()[0]
 
 # COMMAND ----------
 
-# MAGIC %md
-# MAGIC ## 6. Key Takeaways and Future Directions
-# MAGIC
-# MAGIC - Quantum computing offers unique capabilities for specific types of problems
-# MAGIC - Tools like Qiskit make quantum experimentation accessible
-# MAGIC - Current limitations include decoherence and error rates
-# MAGIC - Active areas of research: error correction, quantum advantage demonstration
-# MAGIC
-# MAGIC ### Next Steps:
-# MAGIC - Explore more complex quantum algorithms
-# MAGIC - Try running circuits on real quantum computers
-# MAGIC - Investigate quantum machine learning applications
-# MAGIC - Study quantum error correction techniques
+# Plot the result
+ 
+from matplotlib import pyplot as plt
+ 
+values = pub_result.data.evs
+ 
+errors = pub_result.data.stds
+ 
+# plotting graph
+plt.plot(observables_labels, values, "-o")
+plt.xlabel("Observables")
+plt.ylabel("Values")
+plt.show()
