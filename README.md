@@ -12,7 +12,6 @@ For IDE/pur Pythong, the project is configured using [Poetry](https://python-poe
   - [Obtain IBM Quantum API Token](#obtain-ibm-quantum-api-token)
   - [Set Up Environment Variables](#set-up-environment-variables)
 - [Running the Setup Script](#running-the-setup-script)
-  - [Contents of `setup_qiskit.py`](#contents-of-setup_qiskitpy)
 - [Using the Quantum Circuit](#using-the-quantum-circuit)
 - [Contributing](#contributing)
 - [License](#license)
@@ -21,7 +20,7 @@ For IDE/pur Pythong, the project is configured using [Poetry](https://python-poe
 
 Before you begin, ensure you have met the following requirements:
 
-- **Python 3.7 or higher**: Install Python from the [official website](https://www.python.org/downloads/).
+- **Python 3.10 or higher**: Install Python from the [official website](https://www.python.org/downloads/).
 - **Poetry**: Install Poetry for dependency management by following [these instructions](https://python-poetry.org/docs/#installation).
 - **IBM Quantum Account**: Sign up for a free account at [IBM Quantum](https://quantum-computing.ibm.com/).
 
@@ -99,64 +98,6 @@ Run the `setup_qiskit.py` script to verify your installation and set up your IBM
 
 ```bash
 poetry run python setup_qiskit.py
-```
-
-### Contents of `setup_qiskit.py`
-
-```python:setup_qiskit.py
-import qiskit
-from qiskit import IBMQ, Aer, execute
-from qiskit.providers.ibmq import AccountError
-from qiskit import QuantumCircuit
-from dotenv import load_dotenv
-import os
-
-# Load environment variables from .env file
-load_dotenv()
-
-# Verify installation
-print("Qiskit version:", qiskit.__version__)
-
-# Load IBM Quantum account using the token from environment variables
-api_token = os.getenv('IBM_QUANTUM_TOKEN')
-if api_token:
-    try:
-        IBMQ.save_account(api_token)
-    except:
-        pass  # Account already saved
-    try:
-        IBMQ.load_account()
-        print("IBM Quantum account loaded successfully.")
-    except AccountError as e:
-        print(f"Error loading account: {e}")
-else:
-    print("IBM Quantum API token not found. Please set it in the .env file.")
-
-# List available backends
-try:
-    provider = IBMQ.get_provider()
-    backends = provider.backends()
-    print("Available backends:")
-    for backend in backends:
-        status = backend.status()
-        print(f"- {backend.name()} - {status.pending_jobs} pending jobs")
-except Exception as e:
-    print(f"Error retrieving backends: {e}")
-
-# Create a simple quantum circuit
-qc = QuantumCircuit(2)
-qc.h(0)
-qc.cx(0, 1)
-print("Quantum circuit created:")
-print(qc)
-
-# Execute the circuit on the Qiskit Aer simulator
-backend = Aer.get_backend('qasm_simulator')
-job = execute(qc, backend, shots=1024)
-results = job.result()
-counts = results.get_counts(qc)
-print("Simulation results:")
-print(counts)
 ```
 
 ## Using the Quantum Circuit
